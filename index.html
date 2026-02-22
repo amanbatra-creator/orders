@@ -5,61 +5,57 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Deep Traders : By Dhaliwal</title>
     
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3081/3081648.png">
-    
+
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
-    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    <script src="https://unpkg.com/html5-qrcode"></script>
 
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f1f5f9; margin: 0; padding: 10px; color: #334155; }
-        .app { max-width: 800px; margin: 0 auto; background: #fff; padding: 15px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
-        header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #e2e8f0; padding-bottom: 15px; }
-        h1 { margin: 0; color: #0f172a; font-size: 22px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
-        .sub-header { font-size: 11px; color: #64748b; margin-top: 5px; line-height: 1.4; }
-        .ord-tag { background: #e0f2fe; color: #0284c7; padding: 4px 8px; border-radius: 6px; font-weight: bold; font-size: 13px; display: inline-block; margin-top: 8px; border: 1px solid #bae6fd; }
-
+        body { font-family: sans-serif; background: #f1f5f9; margin: 0; padding: 10px; color: #334155; }
+        .app { max-width: 800px; margin: 0 auto; background: #fff; padding: 15px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        header { text-align: center; border-bottom: 2px solid #eee; margin-bottom: 15px; padding-bottom: 10px; }
+        h1 { margin: 0; font-size: 20px; text-transform: uppercase; color: #0f172a; }
+        
         /* Dashboard */
         .dashboard { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 15px; }
-        .dash-card { background: #f8fafc; padding: 10px; border-radius: 10px; text-align: center; border: 1px solid #e2e8f0; }
-        .dash-val { font-size: 14px; font-weight: bold; color: #0f172a; }
+        .dash-card { background: #f8fafc; padding: 10px; border-radius: 10px; text-align: center; border: 1px solid #ddd; }
+        .dash-val { font-size: 13px; font-weight: bold; color: #0f172a; }
         .dash-lbl { font-size: 9px; color: #64748b; text-transform: uppercase; }
 
         /* Navigation */
         .actions { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 15px; }
-        .btn { border: none; padding: 10px; border-radius: 10px; font-weight: 600; cursor: pointer; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; font-size: 9px; }
-        .b-scan { background: #f97316; } .b-add { background: #3b82f6; } .b-items { background: #64748b; } .b-hist { background: #059669; } .b-data { background: #8b5cf6; }
+        .btn { border: none; padding: 10px; border-radius: 10px; color: white; cursor: pointer; font-size: 8.5px; font-weight: bold; display: flex; flex-direction: column; align-items: center; transition: 0.2s; }
+        .btn:active { transform: scale(0.95); }
+        .b-scan { background: #f97316; } .b-add { background: #3b82f6; } .b-items { background: #64748b; } .b-barcode { background: #8b5cf6; } .b-data { background: #059669; }
 
-        /* Table & Inputs */
-        .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;}
-        input, select { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; box-sizing: border-box; }
-        .list-wrap { overflow-x: auto; border: 1px solid #e2e8f0; border-radius: 10px; }
-        table { width: 100%; border-collapse: collapse; min-width: 500px; }
-        th { background: #1e293b; color: white; padding: 10px; font-size: 11px; text-align: left; }
-        td { padding: 8px; border-bottom: 1px solid #f1f5f9; font-size: 13px; }
+        /* Tables */
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th { background: #1e293b; color: white; padding: 8px; font-size: 11px; text-align: left; }
+        td { padding: 8px; border-bottom: 1px solid #eee; font-size: 13px; }
+        input { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 14px; }
 
         /* Totals */
-        .totals-container { background: #1e293b; color: white; padding: 15px; border-radius: 12px; margin-top: 15px; }
-        .extra-row { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 12px; align-items: center; }
-        .extra-row input { width: 70px; padding: 4px; border: none; border-radius: 4px; text-align: right; }
+        .totals { background: #1e293b; color: white; padding: 15px; border-radius: 12px; margin-top: 15px; }
+        .total-row { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 12px; align-items: center; }
+        .total-row input { width: 80px; padding: 4px; border-radius: 4px; border: none; text-align: right; color: #000; }
 
         /* Modals */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 999; justify-content: center; align-items: center; }
-        .modal-box { background: white; width: 95%; max-width: 500px; padding: 20px; border-radius: 12px; max-height: 80vh; overflow-y: auto; position: relative; }
-        .close { position: absolute; right: 15px; top: 15px; font-size: 24px; cursor: pointer; color: #ef4444; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; }
+        .modal-box { background: white; width: 95%; max-width: 500px; padding: 20px; border-radius: 15px; position: relative; max-height: 80vh; overflow-y: auto; }
+        .close-btn { position: absolute; right: 15px; top: 15px; font-size: 24px; color: red; cursor: pointer; }
 
-        /* --- PRINT STYLES --- */
+        /* Print Media */
         #print-labels-area, #print-receipt-area { display: none; }
         @media print {
             .app, .modal { display: none !important; }
-            body { background: white; margin: 0; padding: 0; }
-            body.print-mode-labels #print-labels-area { display: grid !important; grid-template-columns: repeat(3, 64mm); grid-auto-rows: 34mm; gap: 2mm; padding: 10mm 5mm; }
-            .sticker { width: 64mm; height: 34mm; border: 0.1mm dotted #ccc; display: flex; flex-direction: column; align-items: center; justify-content: center; page-break-inside: avoid; overflow: hidden; }
-            svg.barcode-img { width: 90%; height: 16mm; }
-            body.print-mode-receipt #print-receipt-area { display: block !important; padding: 40px; font-family: 'Courier New', monospace; }
-            .bill-head { text-align: center; border-bottom: 2px solid #000; padding-bottom: 10px; }
-            .unpaid-mark { position: fixed; top: 40%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg); font-size: 80px; color: rgba(0,0,0,0.1); font-weight: bold; border: 10px solid rgba(0,0,0,0.1); padding: 20px; }
+            body { background: white; }
+            body.print-labels #print-labels-area { display: grid !important; grid-template-columns: repeat(3, 64mm); grid-auto-rows: 34mm; gap: 2mm; padding: 10mm; }
+            .sticker { width: 64mm; height: 34mm; border: 0.1mm dotted #ccc; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; page-break-inside: avoid; }
+            svg.barcode-img { width: 90%; height: 15mm !important; }
+            body.print-receipt #print-receipt-area { display: block !important; padding: 40px; font-family: monospace; }
+            .bill-head { text-align: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px; }
+            .unpaid-mark { position: fixed; top: 40%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg); font-size: 70px; color: rgba(0,0,0,0.05); font-weight: bold; border: 10px solid rgba(0,0,0,0.05); padding: 20px; pointer-events: none; }
         }
     </style>
 </head>
@@ -68,8 +64,8 @@
 <div class="app">
     <header>
         <h1>Deep Traders : By Dhaliwal</h1>
-        <div class="sub-header">Wholesale Order System | Ludhiana, Punjab<br>Bakhsis Singh Dhaliwal 97796-79885</div>
-        <div class="ord-tag" id="dispOrderNo">ORD-000000</div>
+        <p style="font-size:11px; color:#64748b; margin:5px 0;">Ludhiana Wholesale | Contact: 97796-79885</p>
+        <div class="ord-tag" id="dispID">ORD-000000</div>
     </header>
 
     <div class="dashboard">
@@ -79,47 +75,57 @@
     </div>
 
     <div class="actions">
-        <button class="btn b-scan" onclick="startScan()"><i>📷</i> SCAN</button>
-        <button class="btn b-add" onclick="openPick()"><i>📦</i> ADD</button>
-        <button class="btn b-items" onclick="openMgr()"><i>⚙️</i> ITEMS</button>
-        <button class="btn b-hist" onclick="openHist()"><i>📜</i> HISTORY</button>
-        <button class="btn b-data" onclick="openData()"><i>💾</i> DATA</button>
+        <button class="btn b-scan" onclick="startScan()">📷 SCAN</button>
+        <button class="btn b-add" onclick="openPick()">📦 ADD</button>
+        <button class="btn b-items" onclick="openMgr()">⚙️ ITEMS</button>
+        <button class="btn b-barcode" onclick="printStickers()">🏷️ BARCODE</button>
+        <button class="btn b-data" onclick="openData()">💾 DATA</button>
     </div>
 
-    <div style="background:#f8fafc; padding:12px; border-radius:12px; border:1px solid #e2e8f0; margin-bottom:10px;">
-        <div class="input-row"><input type="text" id="custName" placeholder="Customer Name"><input type="date" id="orderDate"></div>
-        <select id="payStat" onchange="updateDash()"><option value="Pending">Pending</option><option value="Paid">Paid</option></select>
+    <div style="background:#f8fafc; padding:12px; border-radius:12px; border:1px solid #e2e8f0; margin-bottom:15px;">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:8px;">
+            <input type="text" id="cName" placeholder="Customer Name">
+            <input type="tel" id="cPhone" placeholder="Mobile Number">
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:8px;">
+            <input type="text" id="cCity" placeholder="City/Address">
+            <input type="date" id="oDate">
+        </div>
+        <select id="pStat" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ccc;" onchange="updateDash()">
+            <option value="Pending">Payment: Pending</option>
+            <option value="Paid">Payment: Paid</option>
+        </select>
     </div>
 
-    <div class="list-wrap">
-        <table id="mainTable">
-            <thead><tr><th>Code</th><th>Item</th><th>Qty</th><th>Rate</th><th>Total</th><th></th></tr></thead>
-            <tbody></tbody>
+    <div style="overflow-x:auto;">
+        <table>
+            <thead><tr><th>Item</th><th>Qty</th><th>Rate</th><th>Total</th><th></th></tr></thead>
+            <tbody id="billBody"></tbody>
         </table>
     </div>
 
-    <div class="totals-container">
-        <div class="extra-row"><span>Discount (₹)</span><input type="number" id="inpDisc" value="0" oninput="calc()"></div>
-        <div class="extra-row"><span>Packing (₹)</span><input type="number" id="inpPack" value="0" oninput="calc()"></div>
-        <div style="display:flex; justify-content:space-between; border-top:1px solid #444; padding-top:10px; margin-top:5px;">
-            <span>Qty: <b id="outQty">0</b></span>
-            <span>Grand Total: <b style="font-size:20px; color:#4ade80;">₹ <span id="outGrand">0</span></b></span>
+    <div class="totals">
+        <div class="total-row"><span>Discount (-)</span><input type="number" id="iDisc" value="0" oninput="calc()"></div>
+        <div class="total-row"><span>Packing (+)</span><input type="number" id="iPack" value="0" oninput="calc()"></div>
+        <div style="display:flex; justify-content:space-between; border-top:1px solid #555; padding-top:10px; margin-top:5px;">
+            <span>Qty: <b id="oQty">0</b></span>
+            <span>Total: <b style="font-size:18px; color:#4ade80;">₹ <span id="oGrand">0</span></b></span>
         </div>
     </div>
 
-    <div style="display:grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap:8px; margin-top:15px;">
-        <button class="big-btn" style="background:#64748b" onclick="resetForm()">+ New</button>
-        <button class="big-btn" style="background:#0ea5e9" onclick="saveOrder()">💾 Save</button>
-        <button class="big-btn" style="background:#22c55e" onclick="sendWA()">💬 WA</button>
-        <button class="big-btn" style="background:#0f172a" onclick="printBill()">🧾 Bill</button>
+    <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:8px; margin-top:15px;">
+        <button class="btn" style="background:#64748b; padding:12px; font-size:11px;" onclick="resetForm()">NEW</button>
+        <button class="btn" style="background:#0ea5e9; padding:12px; font-size:11px;" onclick="saveOrder()">SAVE</button>
+        <button class="btn" style="background:#22c55e; padding:12px; font-size:11px;" onclick="sendWA()">WA</button>
+        <button class="btn" style="background:#0f172a; padding:12px; font-size:11px;" onclick="printBill()">BILL</button>
     </div>
 </div>
 
-<div id="modalMgr" class="modal"><div class="modal-box"><span class="close" onclick="closeM('modalMgr')">×</span><h2>Manage Items</h2><div style="display:flex; gap:5px; margin-bottom:10px;"><input id="iName" placeholder="Name"><input id="iSize" placeholder="Size" style="width:60px;"><input type="number" id="iRate" placeholder="Rate"><button onclick="addItem()">Add</button></div><div id="mgrList"></div></div></div>
-<div id="modalPick" class="modal"><div class="modal-box"><span class="close" onclick="closeM('modalPick')">×</span><h2>Pick Item</h2><div id="pickList"></div></div></div>
-<div id="modalHist" class="modal"><div class="modal-box"><span class="close" onclick="closeM('modalHist')">×</span><h2>Order History</h2><div id="histList"></div></div></div>
-<div id="modalData" class="modal"><div class="modal-box"><span class="close" onclick="closeM('modalData')">×</span><h2>Data Management</h2><button onclick="exportData()" style="width:100%; margin-bottom:20px; padding:15px; background:#0ea5e9; color:white; border:none; border-radius:10px;">📥 Backup to Pendrive</button><p>Restore from Backup:</p><input type="file" onchange="importData(this)"><br><br><button onclick="printStickers()" style="width:100%; padding:15px; background:#8b5cf6; color:white; border:none; border-radius:10px;">🖨️ Print 64x34mm Stickers</button></div></div>
-<div id="modalScan" class="modal"><div class="modal-box" style="background:#000;"><span class="close" onclick="stopScan()" style="color:white;">×</span><div id="scanBox"></div></div></div>
+<div id="modalMgr" class="modal"><div class="modal-box"><span class="close-btn" onclick="closeM('modalMgr')">×</span><h3>Manage Inventory</h3><div style="background:#f1f5f9; padding:10px; border-radius:10px; margin-bottom:10px;"><input id="nItem" placeholder="Name" style="margin-bottom:5px;"><input id="nSize" placeholder="Size" style="margin-bottom:5px;"><input type="number" id="nRate" placeholder="Rate" style="margin-bottom:10px;"><button id="btnSaveItem" onclick="addItem()" style="width:100%; padding:10px; background:#22c55e; color:white; border:none; border-radius:5px; font-weight:bold;">Add Item</button></div><div id="mgrList"></div></div></div>
+<div id="modalPick" class="modal"><div class="modal-box"><span class="close-btn" onclick="closeM('modalPick')">×</span><h3>Select Product</h3><input type="text" placeholder="Search..." onkeyup="filterPick(this.value)" style="margin-bottom:10px;"><div id="pickList"></div></div></div>
+<div id="modalHist" class="modal"><div class="modal-box"><span class="close-btn" onclick="closeM('modalHist')">×</span><h3>Order History</h3><input type="text" placeholder="Search orders..." onkeyup="filterHist(this.value)" style="margin-bottom:10px;"><div id="histList"></div></div></div>
+<div id="modalData" class="modal"><div class="modal-box"><span class="close-btn" onclick="closeM('modalData')">×</span><h3>Data Management</h3><button onclick="exportData()" style="width:100%; padding:12px; background:#0ea5e9; color:white; border:none; border-radius:8px; margin-bottom:15px; font-weight:bold;">📥 Export to Pen Drive</button><p style="font-size:12px;">Restore from backup:</p><input type="file" onchange="importData(this)"></div></div>
+<div id="modalScan" class="modal"><div class="modal-box" style="background:#000; padding:0;"><span class="close-btn" onclick="stopScan()" style="color:white; z-index:1100;">×</span><div id="scanBox"></div></div></div>
 
 <div id="print-labels-area"></div>
 <div id="print-receipt-area"></div>
@@ -127,125 +133,135 @@
 <script>
     let db = JSON.parse(localStorage.getItem('dh_db')) || [];
     let orders = JSON.parse(localStorage.getItem('dh_orders')) || [];
+    let editingItemCode = null;
 
-    function save() { localStorage.setItem('dh_db', JSON.stringify(db)); localStorage.setItem('dh_orders', JSON.stringify(orders)); updateDash(); }
-    
+    function sync() { localStorage.setItem('dh_db', JSON.stringify(db)); localStorage.setItem('dh_orders', JSON.stringify(orders)); updateDash(); }
+
     function resetForm() {
-        document.getElementById('dispOrderNo').innerText = 'ORD-' + Math.floor(100000 + Math.random() * 900000);
-        document.getElementById('custName').value = '';
-        document.getElementById('inpDisc').value = 0;
-        document.getElementById('inpPack').value = 0;
-        document.getElementById('orderDate').valueAsDate = new Date();
-        document.querySelector('#mainTable tbody').innerHTML = '';
+        document.getElementById('dispID').innerText = 'ORD-' + Math.floor(Math.random()*900000+100000);
+        document.getElementById('cName').value = ''; document.getElementById('cPhone').value = ''; document.getElementById('cCity').value = '';
+        document.getElementById('iDisc').value = 0; document.getElementById('iPack').value = 0;
+        document.getElementById('oDate').valueAsDate = new Date();
+        document.getElementById('billBody').innerHTML = '';
         addRow(); calc();
     }
 
     function addRow(d={code:'', name:'', qty:1, rate:0}) {
         let tr = document.createElement('tr');
-        tr.innerHTML = `<td><input class="c-code" value="${d.code}"></td><td><input class="c-name" value="${d.name}"></td><td><input type="number" class="c-qty" value="${d.qty}" oninput="calc()"></td><td><input type="number" class="c-rate" value="${d.rate}" oninput="calc()"></td><td class="c-tot">0</td><td><button onclick="this.closest('tr').remove();calc()">×</button></td>`;
-        document.querySelector('#mainTable tbody').appendChild(tr);
+        tr.innerHTML = `<td><small style="color:#64748b">${d.code}</small><br><input class="r-name" value="${d.name}"></td><td><input type="number" class="r-qty" value="${d.qty}" oninput="calc()"></td><td><input type="number" class="r-rate" value="${d.rate}" oninput="calc()"></td><td class="r-tot" style="font-weight:bold">0</td><td><button onclick="this.closest('tr').remove();calc()" style="color:red; background:none; border:none; font-size:18px;">×</button></td>`;
+        document.getElementById('billBody').appendChild(tr);
         calc();
     }
 
     function calc() {
         let q=0, t=0;
-        document.querySelectorAll('#mainTable tbody tr').forEach(r => {
-            let nq = +r.querySelector('.c-qty').value || 0, nr = +r.querySelector('.c-rate').value || 0;
-            let nt = nq * nr;
-            r.querySelector('.c-tot').innerText = nt;
+        document.querySelectorAll('#billBody tr').forEach(r => {
+            let nq = +r.querySelector('.r-qty').value || 0, nr = +r.querySelector('.r-rate').value || 0;
+            let nt = nq * nr; r.querySelector('.r-tot').innerText = nt;
             q += nq; t += nt;
         });
-        let disc = +document.getElementById('inpDisc').value || 0, pack = +document.getElementById('inpPack').value || 0;
-        document.getElementById('outQty').innerText = q;
-        document.getElementById('outGrand').innerText = (t - disc + pack).toLocaleString('en-IN');
+        let grand = t - (+document.getElementById('iDisc').value) + (+document.getElementById('iPack').value);
+        document.getElementById('oQty').innerText = q;
+        document.getElementById('oGrand').innerText = grand.toLocaleString('en-IN');
     }
 
+    /* INVENTORY */
     function addItem() {
-        let n = document.getElementById('iName').value, s = document.getElementById('iSize').value, r = document.getElementById('iRate').value;
-        if(!n || !r) return;
-        db.push({code: Math.random().toString(36).substr(2, 6).toUpperCase(), name: n, size: s, rate: r});
-        save(); renderMgr();
+        let n = document.getElementById('nItem').value, r = document.getElementById('nRate').value, s = document.getElementById('nSize').value;
+        if(!n || !r) return alert("Enter Name and Rate");
+        if(editingItemCode) {
+            let idx = db.findIndex(i => i.code === editingItemCode);
+            db[idx] = { code: editingItemCode, name: n, size: s, rate: r };
+            editingItemCode = null;
+            document.getElementById('btnSaveItem').innerText = "Add Item";
+        } else {
+            db.push({code: Math.random().toString(36).substr(2,6).toUpperCase(), name: n, size: s, rate: r});
+        }
+        sync(); renderMgr();
+        document.getElementById('nItem').value = ''; document.getElementById('nRate').value = ''; document.getElementById('nSize').value = '';
     }
 
     function renderMgr() {
-        document.getElementById('mgrList').innerHTML = db.map((i,idx) => `<div style="display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding:10px;"><span><b>${i.code}</b> - ${i.name}</span><button onclick="db.splice(${idx},1);save();renderMgr()">Del</button></div>`).join('');
+        document.getElementById('mgrList').innerHTML = db.map((i,idx) => `<div style="display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid #eee;"><div><b>${i.name}</b><br><small>${i.code} | Size: ${i.size} | ₹${i.rate}</small></div><div><button onclick="editItem('${i.code}')" style="color:#3b82f6; border:none; background:none; font-weight:bold; margin-right:10px;">Edit</button><button onclick="if(confirm('Delete?')){db.splice(${idx},1);sync();renderMgr()}" style="color:red; border:none; background:none;">Del</button></div></div>`).join('');
     }
 
-    function openPick() { 
-        document.getElementById('modalPick').style.display='flex'; 
-        document.getElementById('pickList').innerHTML = db.map(i => `<div onclick="addRow({code:'${i.code}', name:'${i.name}', qty:1, rate:'${i.rate}'});closeM('modalPick')" style="padding:15px; border-bottom:1px solid #eee; cursor:pointer;">${i.name} (${i.size}) - ₹${i.rate}</div>`).join('');
+    function editItem(code) {
+        let itm = db.find(i => i.code === code);
+        document.getElementById('nItem').value = itm.name; document.getElementById('nSize').value = itm.size; document.getElementById('nRate').value = itm.rate;
+        editingItemCode = code; document.getElementById('btnSaveItem').innerText = "Update Item";
+    }
+
+    /* HISTORY & PICK */
+    function filterPick(val) {
+        let filtered = db.filter(i => i.name.toLowerCase().includes(val.toLowerCase()) || i.code.toLowerCase().includes(val.toLowerCase()));
+        document.getElementById('pickList').innerHTML = filtered.map(i => `<div onclick="addRow({code:'${i.code}', name:'${i.name}', qty:1, rate:'${i.rate}'});closeM('modalPick')" style="padding:15px; border-bottom:1px solid #eee; cursor:pointer;">${i.name} (${i.size}) - ₹${i.rate}</div>`).join('');
     }
 
     function saveOrder() {
         let items = [];
-        document.querySelectorAll('#mainTable tbody tr').forEach(r => {
-            if(r.querySelector('.c-name').value)
-                items.push({code: r.querySelector('.c-code').value, name: r.querySelector('.c-name').value, qty: r.querySelector('.c-qty').value, rate: r.querySelector('.c-rate').value});
+        document.querySelectorAll('#billBody tr').forEach(r => {
+            if(r.querySelector('.r-name').value) items.push({name: r.querySelector('.r-name').value, qty: r.querySelector('.r-qty').value, rate: r.querySelector('.r-rate').value});
         });
-        let order = { id: document.getElementById('dispOrderNo').innerText, date: document.getElementById('orderDate').value, name: document.getElementById('custName').value, items, total: document.getElementById('outGrand').innerText, status: document.getElementById('payStat').value };
+        let order = { id: document.getElementById('dispID').innerText, date: document.getElementById('oDate').value, name: document.getElementById('cName').value, phone: document.getElementById('cPhone').value, city: document.getElementById('cCity').value, disc: document.getElementById('iDisc').value, pack: document.getElementById('iPack').value, items, total: document.getElementById('oGrand').innerText, status: document.getElementById('pStat').value };
         let idx = orders.findIndex(o => o.id === order.id);
         if(idx > -1) orders[idx] = order; else orders.unshift(order);
-        save(); alert("Saved!");
+        sync(); alert("Order Saved!");
     }
 
-    function openHist() {
-        document.getElementById('modalHist').style.display='flex';
-        document.getElementById('histList').innerHTML = orders.map(o => `<div onclick="loadOrder('${o.id}')" style="padding:10px; border-bottom:1px solid #eee; cursor:pointer;"><b>${o.name}</b><br><small>${o.id} | ₹${o.total} | ${o.status}</small></div>`).join('');
+    function filterHist(val) {
+        let filtered = orders.filter(o => o.name.toLowerCase().includes(val.toLowerCase()) || o.id.toLowerCase().includes(val.toLowerCase()));
+        document.getElementById('histList').innerHTML = filtered.map(o => `<div style="padding:12px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center;"><div><b>${o.name}</b><br><small>${o.id} | ₹${o.total} | ${o.status}</small></div><div><button onclick="loadOrder('${o.id}')" style="background:#3b82f6; color:white; border:none; padding:5px 10px; border-radius:4px; font-size:11px;">Edit Bill</button><button onclick="if(confirm('Delete order?')){orders = orders.filter(x=>x.id!=='${o.id}');sync();filterHist('${val}')}" style="margin-left:10px; color:red; border:none; background:none;">Del</button></div></div>`).join('');
     }
 
     function loadOrder(id) {
         let o = orders.find(x => x.id === id);
-        document.getElementById('dispOrderNo').innerText = o.id;
-        document.getElementById('custName').value = o.name;
-        document.getElementById('orderDate').value = o.date;
-        document.getElementById('payStat').value = o.status;
-        document.querySelector('#mainTable tbody').innerHTML = '';
-        o.items.forEach(i => addRow(i));
+        document.getElementById('dispID').innerText = o.id; document.getElementById('cName').value = o.name; document.getElementById('cPhone').value = o.phone || ''; document.getElementById('cCity').value = o.city || '';
+        document.getElementById('oDate').value = o.date; document.getElementById('pStat').value = o.status; document.getElementById('iDisc').value = o.disc || 0; document.getElementById('iPack').value = o.pack || 0;
+        document.getElementById('billBody').innerHTML = ''; o.items.forEach(i => addRow(i));
         calc(); closeM('modalHist');
     }
 
+    /* PRINTING */
     function printStickers() {
+        if(db.length === 0) return alert("Add items first!");
         let area = document.getElementById('print-labels-area');
-        area.innerHTML = db.map(i => `<div class="sticker"><b>${i.name}</b><svg class="barcode-img" id="bc-${i.code}"></svg><span>Size: ${i.size} | ₹${i.rate}</span></div>`).join('');
-        db.forEach(i => JsBarcode("#bc-"+i.code, i.code, { format: "CODE128", height: 35, width: 2, displayValue: true, fontSize: 14 }));
-        document.body.className = 'print-mode-labels'; window.print(); setTimeout(() => document.body.className = '', 500);
+        area.innerHTML = db.map(i => `<div class="sticker"><b>${i.name}</b><svg class="barcode-img" jsbarcode-value="${i.code}"></svg><span>Size: ${i.size} | ₹${i.rate}</span></div>`).join('');
+        JsBarcode(".barcode-img", { format: "CODE128", height: 35, width: 2, displayValue: true, fontSize: 14 }).init();
+        document.body.className = 'print-labels'; window.print();
+        setTimeout(() => document.body.className = '', 500);
     }
 
     function printBill() {
-        let o = { id: document.getElementById('dispOrderNo').innerText, name: document.getElementById('custName').value, date: document.getElementById('orderDate').value, total: document.getElementById('outGrand').innerText, status: document.getElementById('payStat').value };
-        let items = Array.from(document.querySelectorAll('#mainTable tbody tr')).map(r => `<tr><td>${r.querySelector('.c-name').value}</td><td>${r.querySelector('.c-qty').value}</td><td>${r.querySelector('.c-rate').value}</td><td>${r.querySelector('.c-tot').innerText}</td></tr>`).join('');
-        document.getElementById('print-receipt-area').innerHTML = `<div class="bill-head"><h2>Deep Traders : By Dhaliwal</h2><p>Ludhiana, Punjab | 97796-79885</p></div>${o.status==='Pending'?'<div class="unpaid-mark">UNPAID</div>':''}<div style="display:flex; justify-content:space-between;"><span>Party: ${o.name}</span><span>Date: ${o.date}</span></div><div>Order No: ${o.id}</div><table style="width:100%; border-collapse:collapse; margin-top:20px; border:1px solid #000;"><thead><tr style="background:#eee;"><th>Item</th><th>Qty</th><th>Rate</th><th>Total</th></tr></thead><tbody>${items}</tbody></table><div style="text-align:right; margin-top:20px; font-weight:bold; font-size:18px;">GRAND TOTAL: ₹ ${o.total}</div><div style="margin-top:40px; text-align:center;">Computer Generated Invoice - No Signature Required</div><div style="font-size:10px; text-align:center; margin-top:20px;">Goods once sold will not be taken back. | Subject to Ludhiana Jurisdiction.</div>`;
-        document.body.className = 'print-mode-receipt'; window.print(); setTimeout(() => document.body.className = '', 500);
+        let itemsHtml = Array.from(document.querySelectorAll('#billBody tr')).map(r => `<tr><td>${r.querySelector('.r-name').value}</td><td>${r.querySelector('.r-qty').value}</td><td>${r.querySelector('.r-rate').value}</td><td>${r.querySelector('.r-tot').innerText}</td></tr>`).join('');
+        document.getElementById('print-receipt-area').innerHTML = `<div class="bill-head"><h2>Deep Traders : By Dhaliwal</h2><p>Ludhiana | 97796-79885</p></div>${document.getElementById('pStat').value === 'Pending' ? '<div class="unpaid-mark">UNPAID</div>' : ''}<p><b>Party:</b> ${document.getElementById('cName').value} | <b>Mob:</b> ${document.getElementById('cPhone').value}<br><b>Address:</b> ${document.getElementById('cCity').value} | <b>Date:</b> ${document.getElementById('oDate').value}</p><table border="1" style="width:100%; border-collapse:collapse;"><thead><tr style="background:#f1f5f9"><th>Item</th><th>Qty</th><th>Rate</th><th>Total</th></tr></thead><tbody>${itemsHtml}</tbody></table><div style="text-align:right; margin-top:20px;">Subtotal: ₹ ${document.getElementById('oGrand').innerText}<br>Discount: - ₹ ${document.getElementById('iDisc').value}<br>Packing: + ₹ ${document.getElementById('iPack').value}<br><h3 style="margin-top:5px;">Grand Total: ₹ ${document.getElementById('oGrand').innerText}</h3></div><p style="text-align:center; font-size:12px; margin-top:30px; border-top:1px solid #000; padding-top:10px;">Computer Generated Invoice - No Signature Required<br><b>Goods once sold will not be taken back.</b><br>Subject to Ludhiana Jurisdiction.</p>`;
+        document.body.className = 'print-receipt'; window.print();
+        setTimeout(() => document.body.className = '', 500);
+    }
+
+    function sendWA() {
+        let n = document.getElementById('cName').value; let p = document.getElementById('cPhone').value; if(!n) return alert("Enter Name");
+        let itmTxt = ""; document.querySelectorAll('#billBody tr').forEach(r => { if(r.querySelector('.r-name').value) itmTxt += `%0A• ${r.querySelector('.r-name').value} (${r.querySelector('.r-qty').value}pcs)`; });
+        let msg = `*DEEP TRADERS : BY DHALIWAL*%0AOrder No: ${document.getElementById('dispID').innerText}%0A------------------------%0AParty: ${n}${itmTxt}%0A------------------------%0A*GRAND TOTAL: ₹${document.getElementById('oGrand').innerText}*%0AStatus: ${document.getElementById('pStat').value}`;
+        window.open(`https://wa.me/${p.startsWith('91')?p:'91'+p}?text=${msg}`);
     }
 
     function updateDash() {
         document.getElementById('dsTotal').innerText = '₹' + orders.reduce((s,o) => s + +o.total.replace(/,/g,''), 0).toLocaleString('en-IN');
         document.getElementById('dsPending').innerText = '₹' + orders.filter(o => o.status === 'Pending').reduce((s,o) => s + +o.total.replace(/,/g,''), 0).toLocaleString('en-IN');
+        document.getElementById('dsToday').innerText = '₹' + orders.filter(o => o.date === new Date().toISOString().split('T')[0]).reduce((s,o) => s + +o.total.replace(/,/g,''), 0).toLocaleString('en-IN');
     }
 
-    function exportData() {
-        let blob = new Blob([JSON.stringify({db, orders})], {type: 'application/json'});
-        let a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'deep_traders_data.json'; a.click();
-    }
-
-    function importData(inp) {
-        let reader = new FileReader();
-        reader.onload = e => { let d = JSON.parse(e.target.result); db = d.db; orders = d.orders; save(); location.reload(); };
-        reader.readAsText(inp.files[0]);
-    }
-
-    function sendWA() {
-        let txt = `*DEEP TRADERS : BY DHALIWAL*%0AOrder No: ${document.getElementById('dispOrderNo').innerText}%0A------------------------%0AParty: ${document.getElementById('custName').value}%0A*GRAND TOTAL: ₹${document.getElementById('outGrand').innerText}*`;
-        window.open(`https://wa.me/?text=${txt}`);
-    }
-
-    function closeM(id) { document.getElementById(id).style.display='none'; }
+    function exportData() { let blob = new Blob([JSON.stringify({db, orders})], {type: 'application/json'}); let a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'deep_traders_backup.json'; a.click(); }
+    function importData(inp) { let reader = new FileReader(); reader.onload = e => { let d = JSON.parse(e.target.result); db = d.db; orders = d.orders; sync(); location.reload(); }; reader.readAsText(inp.files[0]); }
+    function openData() { document.getElementById('modalData').style.display='flex'; }
+    function openMgr() { document.getElementById('modalMgr').style.display='flex'; renderMgr(); }
+    function openPick() { document.getElementById('modalPick').style.display='flex'; filterPick(''); }
+    function openHist() { document.getElementById('modalHist').style.display='flex'; filterHist(''); }
+    function closeM(id) { document.getElementById(id).style.display='none'; editingItemCode = null; }
     let scanner = null;
-    function startScan() { if(location.protocol === 'file:') return alert("Host on Netlify/Github for Camera."); document.getElementById('modalScan').style.display='flex'; if(!scanner) { scanner = new Html5QrcodeScanner("scanBox", { fps: 15, qrbox: 250 }); scanner.render(res => { let itm = db.find(i => i.code === res); if(itm) { addRow({code: itm.code, name: itm.name, qty: 1, rate: itm.rate}); } }); } }
+    function startScan() { document.getElementById('modalScan').style.display='flex'; if(!scanner) { scanner = new Html5QrcodeScanner("scanBox", { fps: 15, qrbox: 250 }); scanner.render(res => { let itm = db.find(i => i.code === res); if(itm) addRow({code: itm.code, name: itm.name, qty: 1, rate: itm.rate}); }); } }
     function stopScan() { document.getElementById('modalScan').style.display='none'; if(scanner) { scanner.clear(); scanner=null; } }
-
     resetForm(); updateDash();
 </script>
-
 </body>
 </html>
