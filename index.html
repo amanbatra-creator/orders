@@ -151,10 +151,43 @@
         JsBarcode(".barcode-img", { format: "CODE128", height: 35, width: 2, displayValue: true, fontSize: 14 }).init();
         document.body.className = 'print-labels'; window.print(); setTimeout(() => document.body.className = '', 500);
     }
-    function printBill() {
-        let body = Array.from(document.querySelectorAll('#billBody tr')).map(r => `<tr><td>${r.querySelector('.r-name').value}</td><td>${r.querySelector('.r-qty').value}</td><td>${r.querySelector('.r-rate').value}</td><td>${r.querySelector('.r-tot').innerText}</td></tr>`).join('');
-        document.getElementById('print-receipt-area').innerHTML = `<div style="text-align:center;"><h2>Deep Traders : By Dhaliwal</h2><p>Ludhiana | 97796-79885</p></div><p>Party: ${document.getElementById('cName').value}<br>Date: ${document.getElementById('oDate').value}</p><table border="1" style="width:100%; border-collapse:collapse;"><thead><tr><th>Item</th><th>Qty</th><th>Rate</th><th>Total</th></tr></thead><tbody>${body}</tbody></table><h3 style="text-align:right;">Total: ₹ ${document.getElementById('oGrand').innerText}</h3>`;
-        document.body.className = 'print-receipt'; window.print(); setTimeout(() => document.body.className = '', 500);
+function printBill() {
+        let body = "";
+        document.querySelectorAll('#billBody tr').forEach(r => {
+            let nm = r.querySelector('.r-name').value;
+            let q = r.querySelector('.r-qty').value;
+            let rt = r.querySelector('.r-rate').value;
+            let tot = r.querySelector('.r-tot').innerText;
+            if(nm) body += `<tr><td>${nm}</td><td>${q}</td><td>${rt}</td><td>${tot}</td></tr>`;
+        });
+
+        let disc = document.getElementById('iDisc').value || 0;
+        let pack = document.getElementById('iPack').value || 0;
+        let grand = document.getElementById('oGrand').innerText;
+
+        document.getElementById('print-receipt-area').innerHTML = `
+            <div style="text-align:center; border-bottom:1px solid #000; padding-bottom:10px;">
+                <h2 style="margin:0;">DEEP TRADERS : BY DHALIWAL</h2>
+                <p style="margin:5px 0;">Ludhiana Wholesale | 97796-79885</p>
+            </div>
+            <div style="text-align:left; margin:10px 0;">
+                <p><b>Party:</b> ${document.getElementById('cName').value} | <b>Date:</b> ${document.getElementById('oDate').value}</p>
+                <p><b>Order No:</b> ${document.getElementById('dispID').innerText}</p>
+            </div>
+            <table border="1" style="width:100%; border-collapse:collapse;">
+                <thead><tr style="background:#eee;"><th>Item</th><th>Qty</th><th>Rate</th><th>Total</th></tr></thead>
+                <tbody>${body}</tbody>
+            </table>
+            <div style="text-align:right; margin-top:10px; font-weight:bold;">
+                <p>Discount: - ₹ ${disc}</p>
+                <p>Packing: + ₹ ${pack}</p>
+                <p style="font-size:18px;">Grand Total: ₹ ${grand}</p>
+            </div>`;
+            
+        document.body.className = 'print-receipt'; 
+        window.print(); 
+        setTimeout(() => document.body.className = '', 500);
+    }
     }
     function openHist() { document.getElementById('modalHist').style.display='flex'; filterHist(''); }
     function openMgr() { document.getElementById('modalMgr').style.display='flex'; renderMgr(); }
@@ -168,3 +201,4 @@
 </script>
 </body>
 </html>
+
