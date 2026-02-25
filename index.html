@@ -12,7 +12,7 @@
         header { text-align: center; border-bottom: 2px solid #eee; margin-bottom: 15px; padding-bottom: 10px; }
         .actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px; }
         .btn { border: none; padding: 15px 5px; border-radius: 12px; color: white; cursor: pointer; font-size: 11px; font-weight: bold; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; transition: 0.1s; }
-        .btn:active { transform: scale(0.95); }
+        .btn:active { transform: scale(0.95); opacity: 0.8; }
         .b-scan { background: #f97316; } .b-add { background: #3b82f6; } .b-items { background: #64748b; }
         .b-hist { background: #ef4444; } .b-barcode { background: #8b5cf6; } .b-data { background: #059669; }
         input, select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; margin-bottom: 5px; font-size: 14px; }
@@ -21,16 +21,14 @@
         td { padding: 8px; border-bottom: 1px solid #eee; font-size: 13px; }
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; }
         .modal-box { background: white; width: 95%; max-width: 500px; padding: 20px; border-radius: 15px; max-height: 85vh; overflow-y: auto; position: relative; }
-        .edit-btn { background: #2563eb; color: white; border: none; padding: 8px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 11px; }
-        .del-btn { background: #ef4444; color: white; border: none; padding: 8px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 11px; margin-left: 5px; }
+        .rep-card { background: #f8fafc; border: 1px solid #e2e8f0; padding: 10px; border-radius: 10px; text-align: center; }
         .totals { background: #1e293b; color: white; padding: 15px; border-radius: 12px; margin-top: 15px; }
         #print-labels-area, #print-receipt-area { display: none; }
         @media print {
             .app, .modal { display: none !important; }
             body.print-labels #print-labels-area { display: grid !important; grid-template-columns: repeat(3, 64mm); grid-auto-rows: 34mm; gap: 2mm; padding: 10mm; }
             .sticker { width: 64mm; height: 34mm; border: 0.1mm dotted #ccc; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
-            svg.barcode-img { width: 90%; height: 15mm !important; }
-            body.print-receipt #print-receipt-area { display: block !important; padding: 40px; font-family: monospace; }
+            body.print-receipt #print-receipt-area { display: block !important; padding: 20px; font-family: sans-serif; }
         }
     </style>
 </head>
@@ -67,12 +65,28 @@
         <button class="btn" style="background:#0f172a; padding:12px;" onclick="printBill()">🧾 BILL</button>
     </div>
 </div>
+
+<div id="modalHist" class="modal"><div class="modal-box">
+    <h3>Sales Reports</h3>
+    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:5px; margin-bottom:15px;">
+        <div class="rep-card"><small>TODAY</small><br><b id="sumDay" style="color:#059669;">₹0</b></div>
+        <div class="rep-card"><small>WEEK</small><br><b id="sumWeek">₹0</b></div>
+        <div class="rep-card"><small>MONTH</small><br><b id="sumMonth">₹0</b></div>
+    </div>
+    <div style="max-height: 150px; overflow-y: auto; background: #1e293b; color: #fff; padding: 10px; border-radius: 8px; font-size: 11px; margin-bottom:15px;">
+        <table style="width:100%; border:none;"><thead style="background:#334155;"><tr><th style="color:white;">Item</th><th style="color:white;">Qty</th><th style="color:white;">Sales</th></tr></thead><tbody id="fullItemReport"></tbody></table>
+    </div>
+    <input type="text" placeholder="Search orders..." onkeyup="filterHist(this.value)">
+    <div id="histList"></div>
+    <button onclick="closeM('modalHist')" style="width:100%; margin-top:15px; padding:12px; background:#64748b; color:white; border:none; border-radius:8px;">CLOSE</button>
+</div></div>
+
 <div id="modalMgr" class="modal"><div class="modal-box"><h3>Inventory</h3><div style="background:#f1f5f9; padding:10px; border-radius:10px;"><input id="nItem" placeholder="Name"><input id="nSize" placeholder="Size"><input type="number" id="nRate" placeholder="Price"><button id="btnSaveItem" onclick="addItem()" style="width:100%; padding:10px; background:#22c55e; color:white; border:none; border-radius:5px; font-weight:bold;">ADD/UPDATE</button></div><div id="mgrList" style="margin-top:10px;"></div><button onclick="closeM('modalMgr')" style="width:100%; margin-top:10px;">Close</button></div></div>
-<div id="modalHist" class="modal"><div class="modal-box"><h3>Order History</h3><input type="text" placeholder="Search orders..." onkeyup="filterHist(this.value)"><div id="histList"></div><button onclick="closeM('modalHist')" style="width:100%; margin-top:10px;">Close</button></div></div>
 <div id="modalPick" class="modal"><div class="modal-box"><h3>Select Product</h3><div id="pickList"></div><button onclick="closeM('modalPick')" style="width:100%; margin-top:10px;">Close</button></div></div>
-<div id="modalData" class="modal"><div class="modal-box"><h3>Data Backup</h3><button onclick="exportData()" style="width:100%; padding:15px; background:#0ea5e9; color:white; border:none; border-radius:10px; font-weight:bold;">📥 DOWNLOAD BACKUP</button><br><br><input type="file" onchange="importData(this)"><button onclick="closeM('modalData')" style="width:100%; margin-top:10px;">Close</button></div></div>
-<div id="modalScan" class="modal"><div class="modal-box" style="background:#000; padding:0;"><div id="scanBox"></div><button onclick="stopScan()" style="color:white; width:100%; padding:10px; background:red; border:none;">Close Camera</button></div></div>
+<div id="modalData" class="modal"><div class="modal-box"><h3>Settings</h3><button onclick="exportData()" style="width:100%; padding:15px; background:#0ea5e9; color:white; border:none; border-radius:10px; font-weight:bold;">📥 DOWNLOAD BACKUP</button><br><br><input type="file" onchange="importData(this)"><button onclick="closeM('modalData')" style="width:100%; margin-top:15px;">Close</button></div></div>
+<div id="modalScan" class="modal"><div class="modal-box" style="background:#000; padding:0;"><div id="scanBox"></div><button onclick="stopScan()" style="color:white; width:100%; padding:15px; background:red; border:none;">CLOSE CAMERA</button></div></div>
 <div id="print-labels-area"></div><div id="print-receipt-area"></div>
+
 <script>
     let db = JSON.parse(localStorage.getItem('dh_db')) || [];
     let orders = JSON.parse(localStorage.getItem('dh_orders')) || [];
@@ -82,8 +96,7 @@
         document.getElementById('dispID').innerText = 'ORD-' + Math.floor(Math.random()*900000+100000);
         document.getElementById('cName').value = ''; document.getElementById('cPhone').value = ''; document.getElementById('cCity').value = '';
         document.getElementById('iDisc').value = 0; document.getElementById('iPack').value = 0;
-        document.getElementById('oDate').valueAsDate = new Date();
-        document.getElementById('billBody').innerHTML = ''; addRow(); calc();
+        document.getElementById('oDate').valueAsDate = new Date(); document.getElementById('billBody').innerHTML = ''; addRow(); calc();
     }
     function addRow(d={code:'', name:'', qty:1, rate:0}) {
         let tr = document.createElement('tr');
@@ -99,106 +112,84 @@
         let grand = t - (+document.getElementById('iDisc').value || 0) + (+document.getElementById('iPack').value || 0);
         document.getElementById('oQty').innerText = q; document.getElementById('oGrand').innerText = grand.toLocaleString('en-IN');
     }
-    function addItem() {
-        let n = document.getElementById('nItem').value, r = document.getElementById('nRate').value, s = document.getElementById('nSize').value;
-        if(!n || !r) return alert("Enter Name/Rate");
-        if(editingItemCode) {
-            let i = db.findIndex(x => x.code === editingItemCode);
-            db[i] = { code: editingItemCode, name: n, size: s, rate: r };
-            editingItemCode = null; document.getElementById('btnSaveItem').innerText = "ADD/UPDATE";
-        } else {
-            db.push({code: Math.random().toString(36).substr(2,6).toUpperCase(), name: n, size: s, rate: r});
-        }
-        sync(); renderMgr(); document.getElementById('nItem').value = ''; document.getElementById('nRate').value = ''; document.getElementById('nSize').value = '';
+    function saveOrder() {
+        let items = [];
+        document.querySelectorAll('#billBody tr').forEach(r => { if(r.querySelector('.r-name').value) items.push({name: r.querySelector('.r-name').value, qty: +r.querySelector('.r-qty').value, rate: +r.querySelector('.r-rate').value}); });
+        let order = { id: document.getElementById('dispID').innerText, date: document.getElementById('oDate').value, name: document.getElementById('cName').value, phone: document.getElementById('cPhone').value, city: document.getElementById('cCity').value, disc: document.getElementById('iDisc').value, pack: document.getElementById('iPack').value, items, total: document.getElementById('oGrand').innerText };
+        let idx = orders.findIndex(o => o.id === order.id); if(idx > -1) orders[idx] = order; else orders.unshift(order);
+        sync(); alert("Order Saved!");
     }
-    function renderMgr() {
-        document.getElementById('mgrList').innerHTML = db.map((i,idx) => `<div style="display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid #eee;"><div><b>${i.name}</b><br><small>₹${i.rate} | ${i.code}</small></div><div><button class="edit-btn" onclick="editItem('${i.code}')">EDIT</button><button class="del-btn" onclick="if(confirm('Delete?')){db.splice(${idx},1);sync();renderMgr()}">DEL</button></div></div>`).join('');
-    }
-    function editItem(code) {
-        let itm = db.find(x => x.code === code);
-        document.getElementById('nItem').value = itm.name; document.getElementById('nSize').value = itm.size; document.getElementById('nRate').value = itm.rate;
-        editingItemCode = code; document.getElementById('btnSaveItem').innerText = "UPDATE NOW";
+    function runReports() {
+        let now = new Date(); let todayStr = now.toISOString().split('T')[0];
+        let tSales = 0, wSales = 0, mSales = 0, itemStats = {};
+        orders.forEach(o => {
+            let val = +o.total.replace(/,/g, ''); let oDate = new Date(o.date);
+            if(o.date === todayStr) tSales += val;
+            if((now - oDate) / (1000*60*60*24) <= 7) wSales += val;
+            if(oDate.getMonth() === now.getMonth() && oDate.getFullYear() === now.getFullYear()) mSales += val;
+            o.items.forEach(i => {
+                if(!itemStats[i.name]) itemStats[i.name] = { qty: 0, rev: 0 };
+                itemStats[i.name].qty += i.qty; itemStats[i.name].rev += (i.qty * i.rate);
+            });
+        });
+        document.getElementById('sumDay').innerText = '₹'+tSales.toLocaleString('en-IN');
+        document.getElementById('sumWeek').innerText = '₹'+wSales.toLocaleString('en-IN');
+        document.getElementById('sumMonth').innerText = '₹'+mSales.toLocaleString('en-IN');
+        document.getElementById('fullItemReport').innerHTML = Object.entries(itemStats).sort((a,b) => b[1].qty - a[1].qty).map(([n,s]) => `<tr><td>${n}</td><td>${s.qty}</td><td>₹${s.rev.toLocaleString('en-IN')}</td></tr>`).join('') || "<tr><td colspan='3'>No Sales</td></tr>";
     }
     function filterHist(val) {
         let filtered = orders.filter(o => o.name.toLowerCase().includes(val.toLowerCase()) || o.id.toLowerCase().includes(val.toLowerCase()));
-        document.getElementById('histList').innerHTML = filtered.map(o => `<div style="padding:12px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center;"><div><b>${o.name}</b><br><small>${o.id} | ₹${o.total}</small></div><div><button class="edit-btn" onclick="loadOrder('${o.id}')">EDIT</button><button class="del-btn" onclick="if(confirm('Delete?')){orders=orders.filter(x=>x.id!=='${o.id}');sync();filterHist('${val}')}">DEL</button></div></div>`).join('');
+        document.getElementById('histList').innerHTML = filtered.map(o => `<div style="padding:10px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center;"><div><b>${o.name}</b><br><small>${o.id} | ₹${o.total}</small></div><div><button class="edit-btn" onclick="loadOrder('${o.id}')">EDIT</button><button class="del-btn" onclick="if(confirm('Delete?')){orders=orders.filter(x=>x.id!=='${o.id}');sync();filterHist('${val}');runReports();}">DEL</button></div></div>`).join('');
     }
     function loadOrder(id) {
-        let o = orders.find(x => x.id === id);
-        document.getElementById('dispID').innerText = o.id; document.getElementById('cName').value = o.name; document.getElementById('cPhone').value = o.phone || ''; document.getElementById('cCity').value = o.city || '';
+        let o = orders.find(x => x.id === id); document.getElementById('dispID').innerText = o.id; document.getElementById('cName').value = o.name;
+        document.getElementById('cPhone').value = o.phone || ''; document.getElementById('cCity').value = o.city || '';
         document.getElementById('oDate').value = o.date; document.getElementById('iDisc').value = o.disc || 0; document.getElementById('iPack').value = o.pack || 0;
         document.getElementById('billBody').innerHTML = ''; o.items.forEach(i => addRow(i)); calc(); closeM('modalHist');
     }
-    function saveOrder() {
-        let items = [];
-        document.querySelectorAll('#billBody tr').forEach(r => { if(r.querySelector('.r-name').value) items.push({name: r.querySelector('.r-name').value, qty: r.querySelector('.r-qty').value, rate: r.querySelector('.r-rate').value}); });
-        let order = { id: document.getElementById('dispID').innerText, date: document.getElementById('oDate').value, name: document.getElementById('cName').value, phone: document.getElementById('cPhone').value, city: document.getElementById('cCity').value, disc: document.getElementById('iDisc').value, pack: document.getElementById('iPack').value, items, total: document.getElementById('oGrand').innerText };
-        let idx = orders.findIndex(o => o.id === order.id); if(idx > -1) orders[idx] = order; else orders.unshift(order);
-        sync(); alert("Saved!");
-    }
     function sendWA() {
         let n = document.getElementById('cName').value; let p = document.getElementById('cPhone').value; if(!n) return alert("Enter Name");
-        let subtotal = 0; let itxt = ""; 
-        document.querySelectorAll('#billBody tr').forEach(r => { 
+        let itxt = ""; let st = 0; document.querySelectorAll('#billBody tr').forEach(r => { 
             let nm = r.querySelector('.r-name').value; let q = r.querySelector('.r-qty').value; let rt = r.querySelector('.r-rate').value;
-            if(nm) { itxt += `%0A• *${nm}* (${q} x ${rt})`; subtotal += (q * rt); }
+            if(nm) { itxt += `%0A• *${nm}* (${q} x ${rt})`; st += (q * rt); }
         });
-        let msg = `*DEEP TRADERS : BY DHALIWAL*%0AOrder: ${document.getElementById('dispID').innerText}%0A*Party:* ${n}%0A*Details:*${itxt}%0A----------------------------%0ASubtotal: ₹${subtotal}%0ADiscount: -₹${document.getElementById('iDisc').value}%0APacking: +₹${document.getElementById('iPack').value}%0A*GRAND TOTAL: ₹${document.getElementById('oGrand').innerText}*`;
+        let msg = `*DEEP TRADERS : BY DHALIWAL*%0AOrder: ${document.getElementById('dispID').innerText}%0A*Party:* ${n}%0A*Items:*${itxt}%0A----------------------------%0ASubtotal: ₹${st}%0ADiscount: -₹${document.getElementById('iDisc').value}%0APacking: +₹${document.getElementById('iPack').value}%0A*TOTAL: ₹${document.getElementById('oGrand').innerText}*`;
         window.open(`https://wa.me/${p.startsWith('91') ? p : '91' + p}?text=${msg}`);
     }
+    function printBill() {
+        let body = ""; document.querySelectorAll('#billBody tr').forEach(r => { let nm = r.querySelector('.r-name').value; let q = r.querySelector('.r-qty').value; let rt = r.querySelector('.r-rate').value; let tot = r.querySelector('.r-tot').innerText; if(nm) body += `<tr><td>${nm}</td><td>${q}</td><td>${rt}</td><td>${tot}</td></tr>`; });
+        let disc = document.getElementById('iDisc').value || 0; let pack = document.getElementById('iPack').value || 0; let grand = document.getElementById('oGrand').innerText;
+        document.getElementById('print-receipt-area').innerHTML = `<div style="text-align:center;"><h2>DEEP TRADERS</h2><p>Ludhiana | 97796-79885</p></div><p>Party: ${document.getElementById('cName').value}<br>Date: ${document.getElementById('oDate').value}</p><table border="1" style="width:100%; border-collapse:collapse;"><thead><tr style="background:#eee;"><th>Item</th><th>Qty</th><th>Rate</th><th>Total</th></tr></thead><tbody>${body}</tbody></table><div style="text-align:right; margin-top:10px;">Discount: - ₹${disc}<br>Packing: + ₹${pack}<br><h3>Grand Total: ₹${grand}</h3></div>`;
+        document.body.className = 'print-receipt'; window.print(); setTimeout(() => document.body.className = '', 500);
+    }
+    function addItem() {
+        let n = document.getElementById('nItem').value, r = document.getElementById('nRate').value, s = document.getElementById('nSize').value; if(!n || !r) return alert("Enter Name/Price");
+        if(editingItemCode) { let i = db.findIndex(x => x.code === editingItemCode); db[i] = { code: editingItemCode, name: n, size: s, rate: r }; editingItemCode = null; }
+        else { db.push({code: Math.random().toString(36).substr(2,6).toUpperCase(), name: n, size: s, rate: r}); }
+        sync(); renderMgr(); document.getElementById('nItem').value = ''; document.getElementById('nRate').value = '';
+    }
+    function renderMgr() { document.getElementById('mgrList').innerHTML = db.map((i,idx) => `<div style="display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid #eee;"><div><b>${i.name}</b><br><small>₹${i.rate} | ${i.code}</small></div><div><button class="edit-btn" onclick="editItem('${i.code}')">EDIT</button><button class="del-btn" onclick="if(confirm('Delete?')){db.splice(idx,1);sync();renderMgr()}">DEL</button></div></div>`).join(''); }
+    function editItem(code) { let itm = db.find(x => x.code === code); document.getElementById('nItem').value = itm.name; document.getElementById('nSize').value = itm.size; document.getElementById('nRate').value = itm.rate; editingItemCode = code; }
+    function openHist() { document.getElementById('modalHist').style.display='flex'; runReports(); filterHist(''); }
+    function openMgr() { document.getElementById('modalMgr').style.display='flex'; renderMgr(); }
+    function openPick() { document.getElementById('modalPick').style.display='flex'; document.getElementById('pickList').innerHTML = db.map(i => `<div onclick="addRow({code:'${i.code}', name:'${i.name}', qty:1, rate:'${i.rate}'});closeM('modalPick')" style="padding:15px; border-bottom:1px solid #eee; cursor:pointer;">${i.name} - ₹${i.rate}</div>`).join(''); }
+    function openData() { document.getElementById('modalData').style.display='flex'; }
+    function closeM(id) { document.getElementById(id).style.display='none'; editingItemCode = null; }
     function printStickers() {
         let area = document.getElementById('print-labels-area'); area.innerHTML = db.map(i => `<div class="sticker"><b>${i.name}</b><svg class="barcode-img" jsbarcode-value="${i.code}"></svg><span>Size: ${i.size} | ₹${i.rate}</span></div>`).join('');
         JsBarcode(".barcode-img", { format: "CODE128", height: 35, width: 2, displayValue: true, fontSize: 14 }).init();
         document.body.className = 'print-labels'; window.print(); setTimeout(() => document.body.className = '', 500);
     }
-function printBill() {
-        let body = "";
-        document.querySelectorAll('#billBody tr').forEach(r => {
-            let nm = r.querySelector('.r-name').value;
-            let q = r.querySelector('.r-qty').value;
-            let rt = r.querySelector('.r-rate').value;
-            let tot = r.querySelector('.r-tot').innerText;
-            if(nm) body += `<tr><td>${nm}</td><td>${q}</td><td>${rt}</td><td>${tot}</td></tr>`;
-        });
-
-        let disc = document.getElementById('iDisc').value || 0;
-        let pack = document.getElementById('iPack').value || 0;
-        let grand = document.getElementById('oGrand').innerText;
-
-        document.getElementById('print-receipt-area').innerHTML = `
-            <div style="text-align:center; border-bottom:1px solid #000; padding-bottom:10px;">
-                <h2 style="margin:0;">DEEP TRADERS : BY DHALIWAL</h2>
-                <p style="margin:5px 0;">Ludhiana Wholesale | 97796-79885</p>
-            </div>
-            <div style="text-align:left; margin:10px 0;">
-                <p><b>Party:</b> ${document.getElementById('cName').value} | <b>Date:</b> ${document.getElementById('oDate').value}</p>
-                <p><b>Order No:</b> ${document.getElementById('dispID').innerText}</p>
-            </div>
-            <table border="1" style="width:100%; border-collapse:collapse;">
-                <thead><tr style="background:#eee;"><th>Item</th><th>Qty</th><th>Rate</th><th>Total</th></tr></thead>
-                <tbody>${body}</tbody>
-            </table>
-            <div style="text-align:right; margin-top:10px; font-weight:bold;">
-                <p>Discount: - ₹ ${disc}</p>
-                <p>Packing: + ₹ ${pack}</p>
-                <p style="font-size:18px;">Grand Total: ₹ ${grand}</p>
-            </div>`;
-            
-        document.body.className = 'print-receipt'; 
-        window.print(); 
-        setTimeout(() => document.body.className = '', 500);
-    }
-    }
-    function openHist() { document.getElementById('modalHist').style.display='flex'; filterHist(''); }
-    function openMgr() { document.getElementById('modalMgr').style.display='flex'; renderMgr(); }
-    function openPick() { document.getElementById('modalPick').style.display='flex'; document.getElementById('pickList').innerHTML = db.map(i => `<div onclick="addRow({code:'${i.code}', name:'${i.name}', qty:1, rate:'${i.rate}'});closeM('modalPick')" style="padding:15px; border-bottom:1px solid #eee; cursor:pointer;">${i.name} - ₹${i.rate}</div>`).join(''); }
-    function openData() { document.getElementById('modalData').style.display='flex'; }
-    function closeM(id) { document.getElementById(id).style.display='none'; editingItemCode = null; }
     let scanner = null;
-    function startScan() { document.getElementById('modalScan').style.display='flex'; if(!scanner) { scanner = new Html5QrcodeScanner("scanBox", { fps: 15, qrbox: 250 }); scanner.render(res => { let itm = db.find(i => i.code === res); if(itm) addRow({code: itm.code, name: itm.name, qty: 1, rate: itm.rate}); }); } }
+    function startScan() { 
+        document.getElementById('modalScan').style.display='flex'; 
+        if(!scanner) { 
+            scanner = new Html5QrcodeScanner("scanBox", { fps: 15, qrbox: 250 }); 
+            scanner.render(res => { let itm = db.find(i => i.code === res); if(itm) { addRow({code: itm.code, name: itm.name, qty: 1, rate: itm.rate}); stopScan(); } }); 
+        } 
+    }
     function stopScan() { document.getElementById('modalScan').style.display='none'; if(scanner) { scanner.clear(); scanner=null; } }
     resetForm();
 </script>
 </body>
 </html>
-
