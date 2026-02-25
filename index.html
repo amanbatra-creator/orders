@@ -226,8 +226,32 @@
     }
 
     function sendWA() {
-        let p = document.getElementById('cPhone').value; let n = document.getElementById('cName').value; if(!n) return alert("Enter Name");
-        window.open(`https://wa.me/${p.startsWith('91')?p:'91'+p}?text=*DEEP TRADERS*%0AParty: ${n}%0ATotal: ₹${document.getElementById('oGrand').innerText}`);
+       function sendWA() {
+        let n = document.getElementById('cName').value; 
+        let p = document.getElementById('cPhone').value; 
+        if(!n) return alert("Please enter the Customer Name first.");
+        
+        let subtotal = 0;
+        let itemsTxt = ""; 
+        
+        document.querySelectorAll('#billBody tr').forEach(r => { 
+            let name = r.querySelector('.r-name').value;
+            let qty = r.querySelector('.r-qty').value;
+            let rate = r.querySelector('.r-rate').value;
+            if(name && qty > 0) {
+                let lineTotal = qty * rate;
+                itemsTxt += `%0A• *${name}* (${qty} x ${rate} = ₹${lineTotal})`; 
+                subtotal += lineTotal;
+            }
+        });
+        
+        let disc = document.getElementById('iDisc').value || 0;
+        let pack = document.getElementById('iPack').value || 0;
+        let grand = document.getElementById('oGrand').innerText;
+
+        let msg = `*DEEP TRADERS : BY DHALIWAL*%0A*Order No:* ${document.getElementById('dispID').innerText}%0A----------------------------%0A*Customer:* ${n}%0A*Phone:* ${p}%0A----------------------------%0A*BILL DETAILS:*${itemsTxt}%0A----------------------------%0A*Subtotal:* ₹${subtotal}%0A*Discount:* -₹${disc}%0A*Packing/Handl:* +₹${pack}%0A*GRAND TOTAL: ₹${grand}*%0A----------------------------%0A_Thank you for your business!_`;
+        
+        window.open(`https://wa.me/${p.startsWith('91') ? p : '91' + p}?text=${msg}`);
     }
 
     function exportData() { let blob = new Blob([JSON.stringify({db, orders})], {type: 'application/json'}); let a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'backup.json'; a.click(); }
@@ -240,3 +264,4 @@
 </script>
 </body>
 </html>
+
