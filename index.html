@@ -159,7 +159,7 @@
     function printBill() {
         let body = ""; document.querySelectorAll('#billBody tr').forEach(r => { let nm = r.querySelector('.r-name').value; let q = r.querySelector('.r-qty').value; let rt = r.querySelector('.r-rate').value; let tot = r.querySelector('.r-tot').innerText; if(nm) body += `<tr><td>${nm}</td><td>${q}</td><td>${rt}</td><td>${tot}</td></tr>`; });
         let disc = document.getElementById('iDisc').value || 0; let pack = document.getElementById('iPack').value || 0; let grand = document.getElementById('oGrand').innerText;
-        document.getElementById('print-receipt-area').innerHTML = `<div style="text-align:center;"><h2>DEEP TRADERS</h2><p>Ludhiana | 97796-79885</p></div><p>Party: ${document.getElementById('cName').value}<br>Date: ${document.getElementById('oDate').value}</p><table border="1" style="width:100%; border-collapse:collapse;"><thead><tr style="background:#eee;"><th>Item</th><th>Qty</th><th>Rate</th><th>Total</th></tr></thead><tbody>${body}</tbody></table><div style="text-align:right; margin-top:10px;">Discount: - ₹${disc}<br>Packing: + ₹${pack}<br><h3>Grand Total: ₹${grand}</h3></div>`;
+        document.getElementById('print-receipt-area').innerHTML = `<div style="text-align:center;"><h2>DEEP TRADERS</h2><p>Ludhiana | +91-788-853-2858</p></div><p>Party: ${document.getElementById('cName').value}<br>Date: ${document.getElementById('oDate').value}</p><table border="1" style="width:100%; border-collapse:collapse;"><thead><tr style="background:#eee;"><th>Item</th><th>Qty</th><th>Rate</th><th>Total</th></tr></thead><tbody>${body}</tbody></table><div style="text-align:right; margin-top:10px;">Discount: - ₹${disc}<br>Packing: + ₹${pack}<br><h3>Grand Total: ₹${grand}</h3></div>`;
         document.body.className = 'print-receipt'; window.print(); setTimeout(() => document.body.className = '', 500);
     }
     function addItem() {
@@ -193,4 +193,5 @@
 </script>
 </body>
 </html>
+
 
